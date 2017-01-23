@@ -5,6 +5,7 @@ var path = require('path');
 var makeRouter = require('./routes');
 var bodyParser = require('body-parser');
 var nunjucks = require('nunjucks');
+var models = require('./models')
 
 
 
@@ -21,8 +22,17 @@ app.engine('html', nunjucks.render);
 
 app.use(express.static(path.join(__dirname, '/public')));
 
-app.listen(3000, function(){
-  console.log('server is listening');
-});
+
+models.User.sync({})
+  .then(function (){
+    return models.Page.sync({})
+  })
+  .then(function(){
+    app.listen(3000, function(){
+    console.log('server is listening');
+    });
+  })
+  .catch(console.error);
+
 
 module.exports = app;
