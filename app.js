@@ -6,7 +6,7 @@ var makeRouter = require('./routes');
 var bodyParser = require('body-parser');
 var nunjucks = require('nunjucks');
 var models = require('./models')
-
+var routes = require('./routes')
 
 
 app.use(morgan('dev'));
@@ -18,9 +18,14 @@ app.set('view engine', 'html');
 // when res.render works with html files, have it use nunjucks to do so
 app.engine('html', nunjucks.render);
 
+// body parsing middleware
+app.use(bodyParser.urlencoded({ extended: true })); // for HTML form submits
+app.use(bodyParser.json()); // would be for AJAX requests
 
+app.use(routes);
 
 app.use(express.static(path.join(__dirname, '/public')));
+
 
 
 models.User.sync({})
