@@ -1,45 +1,52 @@
 const express = require('express');
 const router = express.Router();
 const model = require('../models');
+const Page = model.Page;
+const User = model.User;
 
-
-router.get('/wiki', function(req, res, next){
-  res.render('index')
+router.get('/', function(req, res, next){
+  Page.findAll({})
+  .then(function (pages){
+    res.render('index', {
+      pages: pages
+    });
+  })
+  .catch(next);
 });
 
-router.get('/wiki/add', function(req, res, next){
+router.get('/add', function(req, res, next){
   res.render('addpage.html');
 });
 
-router.post('/wiki', function(req, res, next){
-  
-  model.Page.create({
-    title: req.body.title,
-    content: req.body.pageContent,
-  }).then(function(instance){
-    res.json(instance);
-  });
-
-  // res.json new page instance 
-   // page.save();
-  //.then(function(){
-  //   res.json(page);
-  // });
+router.post('/', function(req, res, next){
+var newPage = Page.build(req.body);
+    //using Synchronous .build with .save
+    newPage.save()
+    .then(function(savedPage){
+      res.redirectr(savedPage.route)
+    })
+    .catch(function (err){
+      next(err);
+    });
 
 });
 
-router.get('/wiki/:urlTitle', function(req, res, next){
-  
-  model.Page.findOne({ 
-    where: { 
-      url_title: req.params.urlTitle 
-    } 
+router.get('/:urlTitle', function(req, res, next){
+  var urlTitleOfPage = req.body.urlTitle;
+
+  Page.findOne({
+    where: {
+      url_title: req.params.urlTitle
+    }
   })
-  .then(function(foundPage){
-    res.render('wikipage.html', {
-      title: foundPage.title,
-      content: foundPage.content
+  .then(function(page){
+    if(page === null){
+      res.status(404).send();
+    }else{
+    res.render('wikipage', {
+      page: page
     });
+    }
   })
   .catch(next);
 

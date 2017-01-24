@@ -22,11 +22,15 @@ app.engine('html', nunjucks.render);
 app.use(bodyParser.urlencoded({ extended: true })); // for HTML form submits
 app.use(bodyParser.json()); // would be for AJAX requests
 
-app.use(routes);
+app.use('/wiki', routes);
 
 app.use(express.static(path.join(__dirname, '/public')));
 
-
+//error handler
+app.use(function(err, req, res, next){
+  console.error(err)
+  res.status(500).send(err.message)
+})
 
 models.User.sync({})
   .then(function (){
