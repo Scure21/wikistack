@@ -1,7 +1,0 @@
-// Place your settings in this file to overwrite default and user settings.
-{
-  "terminal.integrated.shellArgs.linux": ["-l"]
-,
-"terminal.external.osxExec": "iterm.app",
-"terminal.integrated.shell.linux": "/usr/local/bin"
-}

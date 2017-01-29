@@ -1,46 +1,48 @@
-var express = require('express');
+var express = require("express");
 var app = express();
-var morgan = require('morgan');
-var path = require('path');
-var makeRouter = require('./routes');
-var bodyParser = require('body-parser');
-var nunjucks = require('nunjucks');
-var models = require('./models')
-var routes = require('./routes')
+var morgan = require("morgan");
+var path = require("path");
+var makeRouter = require("./routes");
+var bodyParser = require("body-parser");
+var nunjucks = require("nunjucks");
+var models = require("./models");
+var wikiRouter = require('./routes/wiki.js');
+var usersRouter = require('./routes/users.js');
 
 
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // point nunjucks to the directory containing templates and turn off caching; configure returns an Environment instance, which we'll want to use to add Markdown support later.
-var env = nunjucks.configure('views', {noCache: true});
+var env = nunjucks.configure("views", {noCache: true});
 // have res.render work with html files
-app.set('view engine', 'html');
+app.set("view engine", "html");
 // when res.render works with html files, have it use nunjucks to do so
-app.engine('html', nunjucks.render);
+app.engine("html", nunjucks.render);
 
 // body parsing middleware
 app.use(bodyParser.urlencoded({ extended: true })); // for HTML form submits
 app.use(bodyParser.json()); // would be for AJAX requests
 
-app.use('/wiki', routes);
+app.use("/wiki", wikiRouter);
+app.use("/users", usersRouter);
 
-app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, "/public")));
 
 //error handler
 app.use(function(err, req, res, next){
-  console.error(err)
-  res.status(500).send(err.message)
-})
+	console.error(err);
+	res.status(500).send(err.message);
+});
 
-models.User.sync({})
+models.User.sync()
   .then(function (){
-    return models.Page.sync({})
-  })
+	return models.Page.sync();
+})
   .then(function(){
-    app.listen(3000, function(){
-    console.log('server is listening');
-    });
-  })
+	app.listen(3000, function(){
+		console.log("server is listening");
+	});
+})
   .catch(console.error);
 
 
